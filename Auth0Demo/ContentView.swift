@@ -44,26 +44,6 @@ struct ContentView: View {
         }
     }
     
-    /*
-    func plistValues(bundle: Bundle) -> (clientId: String, domain: String)? {
-        guard
-            let path = bundle.path(forResource: "Auth0", ofType: "plist"),
-            let values = NSDictionary(contentsOfFile: path) as? [String: Any]
-            else {
-                print("Missing Auth0.plist file with 'ClientId' and 'Domain' entries in main bundle!")
-                return nil
-            }
-        guard
-            let clientId = values["ClientId"] as? String,
-            let domain = values["Domain"] as? String
-            else {
-                print("Auth0.plist file at \(path) is missing 'ClientId' and/or 'Domain' entries!")
-                print("File currently has the following entries: \(values)")
-                return nil
-            }
-        return (clientId: clientId, domain: domain)
-    }
-     */
     func logout(){
         Auth0.webAuth().clearSession(federated: false){ result in
             if result {
@@ -71,7 +51,7 @@ struct ContentView: View {
                 self.credentialsManager.revoke{error in
                     guard error == nil else {
                         // Handle error
-                        print("Error: \(error)")
+                        print("Error: \(String(describing: error))")
                         return}
                 print("ログアウトOK")
                 }
@@ -82,10 +62,11 @@ struct ContentView: View {
     func login(){
         
         //guard let clientInfo = plistValues(bundle: Bundle.main) else { return }
-        var result = self.credentialsManager.hasValid()
-        var acc = self.credentials?.accessToken
+        //var result = self.credentialsManager.hasValid()
+        //var accesstoken = self.credentials?.accessToken
         
         if self.credentialsManager.hasValid(){
+            /*
             let refreshToken = self.credentials?.refreshToken ?? nil
             Auth0
                 .authentication()
@@ -105,6 +86,7 @@ struct ContentView: View {
                     }
                 
                 }
+             */
         }
         else {
             Auth0
@@ -120,9 +102,7 @@ struct ContentView: View {
                         print("Credentials:\(credentials)")
                         //self.credentialsManager.store(credentials: credentials)
                         guard let accessToken = credentials.accessToken
-                        else {
-                                  return
-                              }
+                        else {return}
                         self.keychain.setString(accessToken, forKey: "access_token")
                         //self.keychain.setString(refreshToken, forKey: "refresh_token")
                         print("accesstoken=\(String(describing: self.keychain.data(forKey: "access_token")))")
@@ -135,20 +115,6 @@ struct ContentView: View {
             
         
     }
-    
-    /*
-    func logout(){
-        self.credentialsManager.revoke { error in
-            guard error == nil else {
-                // Handle error
-                print("Error: \(error)")
-                return
-            }
-
-            // The user is now logged out
-        }
-    }
-     */
     
 }
 
