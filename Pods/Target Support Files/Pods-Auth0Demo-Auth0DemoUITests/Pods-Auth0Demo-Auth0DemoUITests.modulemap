@@ -1,0 +1,6 @@
+framework module Pods_Auth0Demo_Auth0DemoUITests {
+  umbrella header "Pods-Auth0Demo-Auth0DemoUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}
