@@ -8,6 +8,7 @@
 import SwiftUI
 import Auth0
 import SimpleKeychain
+import JWTDecode
 
 struct ContentView: View {
     
@@ -15,6 +16,7 @@ struct ContentView: View {
     let credentialsManager = CredentialsManager(authentication: Auth0.authentication())
     let keychain = A0SimpleKeychain(service: "Auth0")
     var credentials: Credentials?
+    @State var profile: UserInfo!
     
     var body: some View {
         VStack{
@@ -101,18 +103,39 @@ struct ContentView: View {
                     case .success(let credentials):
                         print("Credentials:\(credentials)")
                         //self.credentialsManager.store(credentials: credentials)
-                        guard let accessToken = credentials.accessToken
+                        guard let accessTokenGet = credentials.accessToken
                         else {return}
-                        self.keychain.setString(accessToken, forKey: "access_token")
+                        print("firstAccessToken=\(accessTokenGet)")
+                        self.keychain.setString(accessTokenGet, forKey: "access_token")
                         //self.keychain.setString(refreshToken, forKey: "refresh_token")
                         print("accesstoken=\(String(describing: self.keychain.data(forKey: "access_token")))")
                         //print("refreshtoken=\(refreshToken)")
-                        
+                        //guard let jwt = try? decode(jwt: accessToken) else {return}
+                        //guard let subjwt = jwt.body["sub"] as? String else {return}
+                        //print("subid=\(subjwt)")
                     }
                 }
+            
+            var accessToken = self.keychain.string(forKey: "access_token")
+            
+            let accessTokenAuthentication = accessToken!
+            
+            print("acctest=\(accessTokenAuthentication)")
+            Auth0
+                .authentication()
+                .userInfo(withAccessToken: accessTokenAuthentication)
+                .start { result in
+                    switch(result) {
+                        case .success(let profile):
+                            print(profile)
+                            print(profile.sub)
+                        case .failure(let error):
+                            print("Failed to retrieve profile: \(String(describing: error))")
+                    }
+                }
+             
             return
         }
-            
         
     }
     
